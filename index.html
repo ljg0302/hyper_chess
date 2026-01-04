@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HyperChess (Web)</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>HyperChess (Web)</h1>
+
+      <div class="meta">
+        <span id="turnText"></span>
+        <span id="scoreText"></span>
+        <span id="statusText"></span>
+        <span id="phaseText"></span>
+      </div>
+
+      <div class="buttons">
+        <button id="aiToggleBtn">AI: OFF</button>
+        <button id="aiSideBtn">AI SIDE: WHITE</button>
+        <button id="resetBtn">Reset</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="boardWrap">
+        <canvas id="board"></canvas>
+
+        <!-- 큰 턴 오버레이 -->
+        <div id="turnOverlay" class="turnOverlay hidden"></div>
+      </div>
+
+      <aside id="panel">
+        <div class="card">
+          <h3>Controls</h3>
+          <ul>
+            <li><b>좌클릭</b>: 선택 / 이동 / 돌 놓기</li>
+            <li><b>우클릭</b>: 소환할 칸 지정(보라색 표시)</li>
+            <li>말 선택 후 노란 링=이동, 초록 링=캡처</li>
+          </ul>
+        </div>
+
+        <div class="card" id="summonCard">
+          <h3>Summon</h3>
+          <p class="hint">보드에서 <b>우클릭</b>한 칸에 소환 (점수 소모)</p>
+
+          <div class="summonRow">
+            <span>Cell:</span> <span id="summonCellText">-</span>
+          </div>
+
+          <div class="summonBtns">
+            <button data-kind="N">N (cost 4)</button>
+            <button data-kind="B">B (cost 4)</button>
+            <button data-kind="R">R (cost 6)</button>
+            <button data-kind="Q">Q (cost 10)</button>
+          </div>
+
+          <button id="summonCancelBtn">Cancel</button>
+          <div id="summonInfo" class="hint"></div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Swap2: P2 decision modal (Close 없음) -->
+  <div id="swap2DecisionModal" class="modal hidden">
+    <div class="modal__card">
+      <h2>Swap2 - Player2 선택</h2>
+      <p class="modal__desc">
+        첫 3수를 보고 결정하세요.
+        (1) 지금 흑/백 선택 또는 (2) 2수 더 두고 P1에게 흑/백 선택권 넘기기
+      </p>
+
+      <div class="modal__actions">
+        <button id="swap2ChooseNowBtn" class="btn btn--primary">
+          ① 지금 흑/백 선택하기
+        </button>
+        <button id="swap2PlaceTwoMoreBtn" class="btn">
+          ② 2수 더 두고 P1에게 선택권 넘기기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Swap2: Color pick modal (Close 없음, Back 있음) -->
+  <div id="swap2ColorModal" class="modal hidden">
+    <div class="modal__card">
+      <h2>Swap2 - 색 선택</h2>
+      <p class="modal__desc" id="swap2ColorDesc">선택 안내</p>
+
+      <div class="modal__actions">
+        <button id="swap2PickBlackBtn" class="btn btn--primary">BLACK 선택</button>
+        <button id="swap2PickWhiteBtn" class="btn">WHITE 선택</button>
+        <button id="swap2BackBtn" class="btn btn--ghost">← 뒤로가기</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
