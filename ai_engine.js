@@ -1,4 +1,4 @@
-// web/js/ai_engine.js
+// HyperChess/js/ai_engine.js
 // Python ai_engine.py 포팅 (동일 로직/우선순위)
 // - 즉시승리 -> 즉시패배방지(시뮬 기반) -> 열린3 방어 -> 평가함수
 // - PLACE / SUMMON / MOVE 모두 고려
