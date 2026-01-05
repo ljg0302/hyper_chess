@@ -597,19 +597,31 @@ function finalizeSwap2ColorPick(pickerPlayer, pickedColor) {
   state.playerColor[pickerPlayer] = pickedColor;
   state.playerColor[opponent(pickerPlayer)] = opponent(pickedColor);
 
+  // ✅ moveNo를 opening 기준으로 강제 동기화 (버그 방지)
+  state.moveNo = Array.isArray(state.opening) ? state.opening.length : state.moveNo;
+
   state.phase = "play";
   closeSwapModal();
   clearSelection();
   closeSummon();
 
-  // 게임 시작은 BLACK부터
-  state.turn = 1;
+  // ✅ 핵심: "항상 흑부터" 같은 고정 금지
+  // 마지막 오프닝 수의 색을 기준으로 다음 턴 색 결정
+  const last = state.opening?.[state.opening.length - 1];
+  if (last && (last.color === 1 || last.color === 2)) {
+    state.turn = opponent(last.color); // 다음 색은 무조건 반대색
+  } else {
+    // 혹시 opening이 비어있으면 안전하게 black
+    state.turn = 1;
+  }
+
   const who = currentPlayerByColorTurn();
-  showTurnOverlay(`START: BLACK (P${who})`);
+  showTurnOverlay(`START: ${state.turn === 1 ? "BLACK" : "WHITE"} (P${who})`);
 
   syncSummonInfo();
   maybeRunAI();
 }
+
 
 // =====================
 // Human Input
