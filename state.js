@@ -1,4 +1,4 @@
-// HyperChess/js/state.js
+// HyperChess/state.js
 import { BOARD_SIZE } from "./config.js";
 
 export function makeEmptyBoard() {
