@@ -760,6 +760,114 @@ canvas.addEventListener("contextmenu", (e) => {
 });
 
 // =====================
+// Touch: Long-press to Summon (mobile)
+// =====================
+const LONG_PRESS_MS = 450;
+
+let touchTimer = null;
+let touchStartPos = null;       // {x,y}
+let touchStartCell = null;      // [i,j]
+let touchMoved = false;
+let longPressed = false;
+
+function clearTouchTimer() {
+  if (touchTimer) {
+    clearTimeout(touchTimer);
+    touchTimer = null;
+  }
+}
+
+function getTouchXY(ev) {
+  const t = ev.touches?.[0] || ev.changedTouches?.[0];
+  if (!t) return null;
+  const rect = canvas.getBoundingClientRect();
+  return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+}
+
+// 모바일에서 화면 스크롤/줌 제스처가 캔버스 플레이를 방해하지 않게
+// (CSS의 touch-action도 같이 추천하지만, JS에서도 방어)
+canvas.addEventListener("touchstart", (ev) => {
+  if (ev.touches.length !== 1) return;
+  ev.preventDefault();
+
+  const pos = getTouchXY(ev);
+  if (!pos) return;
+
+  const cell = mouseToIdx(pos.x, pos.y);
+  if (!cell) return;
+
+  touchStartPos = pos;
+  touchStartCell = cell;
+  touchMoved = false;
+  longPressed = false;
+
+  clearTouchTimer();
+  touchTimer = setTimeout(() => {
+    // 롱프레스 트리거
+    longPressed = true;
+    const [i, j] = touchStartCell;
+
+    // 빈칸이면 소환 패널 열기 (기존 우클릭 로직 재사용)
+    handleRightClickCell(i, j);
+  }, LONG_PRESS_MS);
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (ev) => {
+  if (!touchStartPos) return;
+  ev.preventDefault();
+
+  const pos = getTouchXY(ev);
+  if (!pos) return;
+
+  // 조금이라도 움직이면 롱프레스 취소(스크롤/드래그 방지)
+  const dx = pos.x - touchStartPos.x;
+  const dy = pos.y - touchStartPos.y;
+  const dist2 = dx*dx + dy*dy;
+
+  // 8px 정도 움직이면 취소
+  if (dist2 > 64) {
+    touchMoved = true;
+    clearTouchTimer();
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", (ev) => {
+  ev.preventDefault();
+
+  // 롱프레스가 이미 실행됐으면(소환 패널 열림) 탭 행동은 하지 않음
+  if (longPressed) {
+    clearTouchTimer();
+    touchStartPos = null;
+    touchStartCell = null;
+    longPressed = false;
+    return;
+  }
+
+  // 롱프레스가 아닌 경우: 탭 = 좌클릭과 동일 처리
+  clearTouchTimer();
+
+  if (!touchStartCell || touchMoved) {
+    touchStartPos = null;
+    touchStartCell = null;
+    return;
+  }
+
+  const [i, j] = touchStartCell;
+  handleLeftClickCell(i, j);
+
+  touchStartPos = null;
+  touchStartCell = null;
+}, { passive: false });
+
+canvas.addEventListener("touchcancel", () => {
+  clearTouchTimer();
+  touchStartPos = null;
+  touchStartCell = null;
+  touchMoved = false;
+  longPressed = false;
+}, { passive: false });
+
+// =====================
 // Reset
 // =====================
 function fullReset() {
